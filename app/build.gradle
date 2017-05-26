@@ -35,6 +35,10 @@ dependencies {
     compile "com.squareup.retrofit2:adapter-rxjava:$retrofitVersion"
     compile "com.squareup.retrofit2:converter-gson:$retrofitVersion"
     compile 'com.github.bumptech.glide:glide:3.7.0'
+
+    def rxlifecycleVersion = '0.6.1'
+    compile "com.trello:rxlifecycle-kotlin:$rxlifecycleVersion"
+    compile "com.trello:rxlifecycle-components:$rxlifecycleVersion"
 }
 repositories {
     mavenCentral()

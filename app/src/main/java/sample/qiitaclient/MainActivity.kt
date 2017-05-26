@@ -1,12 +1,14 @@
 package sample.qiitaclient
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ListView
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
+import com.trello.rxlifecycle.components.support.RxAppCompatActivity
+import com.trello.rxlifecycle.kotlin.bindToLifecycle
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
@@ -16,11 +18,13 @@ import sample.qiitaclient.client.ArticleClient
 import sample.qiitaclient.model.Article
 import sample.qiitaclient.model.User
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : RxAppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val progressBar = findViewById(R.id.progress_bar)
 
         //ダミー記事をアダプターに登録する
         val listAdapter = ArticleListAdapter(applicationContext)
@@ -30,7 +34,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         //リストビューにアダプターを設定する
-        var listView = findViewById(R.id.list_view) as ListView
+        val listView = findViewById(R.id.list_view) as ListView
         listView.adapter = listAdapter
 
 
@@ -62,9 +66,15 @@ class MainActivity : AppCompatActivity() {
 
         searchButton.setOnClickListener {
 
+            progressBar.visibility = View.VISIBLE
+
             articleClient.search(queryEditText.text.toString())
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .doAfterTerminate {
+                        progressBar.visibility = View.GONE
+                    }
+                    .bindToLifecycle(this)
                     .subscribe({
                         queryEditText.text.clear()
                         listAdapter.articles = it
@@ -80,5 +90,7 @@ class MainActivity : AppCompatActivity() {
         Article(id = "",
                 title = title,
                 url = "http://qiita.com/organizations/st-ventures",
-                user = User(id = "", name = userName, profileImageUrl = "https://qiita-image-store.s3.amazonaws.com/0/71694/profile-images/1480679524"))
+                user = User(id = "",
+                        name = userName,
+                        profileImageUrl = "https://qiita-image-store.s3.amazonaws.com/0/71694/profile-images/1480679524"))
 }
