@@ -22,12 +22,24 @@ class MainActivity : AppCompatActivity() {
         //リストビューにアダプターを設定する
         var listView = findViewById(R.id.list_view) as ListView
         listView.adapter = listAdapter
+
+
+        //リストを選択したとき（ラムダ式）
+        listView.setOnItemClickListener { adapterView, view, position, id ->
+
+            val article = listAdapter.articles[position]
+
+            //コンパニオンオブジェクトのメソッドを呼ぶ
+            ArticleActivity.intent(this, article).let {
+                startActivity(it)
+            }
+        }
     }
 
     private fun dummyArticle(title: String, userName: String) :  Article =
 
         Article(id = "",
                 title = title,
-                url = "http://www",
+                url = "http://qiita.com/organizations/st-ventures",
                 user = User(id = "", name = userName, profileImageUrl = ""))
 }
